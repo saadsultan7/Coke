@@ -3,6 +3,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useScroll, useMotionValueEvent } from "framer-motion";
 import { Product } from "@/data/products";
+import BottleSkeleton from "./BottleSkeleton";
 
 interface ProductBottleScrollProps {
     product: Product;
@@ -12,6 +13,8 @@ const ProductBottleScroll: React.FC<ProductBottleScrollProps> = ({ product }) =>
     const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [images, setImages] = useState<HTMLImageElement[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [loadProgress, setLoadProgress] = useState(0);
     const { scrollYProgress } = useScroll({
         target: containerRef,
         offset: ["start start", "end end"],
@@ -19,6 +22,8 @@ const ProductBottleScroll: React.FC<ProductBottleScrollProps> = ({ product }) =>
 
     // Preload images
     useEffect(() => {
+        setIsLoading(true);
+        setLoadProgress(0);
         const loadedImages: HTMLImageElement[] = [];
         let loadedCount = 0;
         const totalFrames = 240;
@@ -31,15 +36,20 @@ const ProductBottleScroll: React.FC<ProductBottleScrollProps> = ({ product }) =>
 
             img.onload = () => {
                 loadedCount++;
+                setLoadProgress((loadedCount / totalFrames) * 100);
                 if (loadedCount === totalFrames) {
                     setImages(loadedImages);
+                    // Small delay to ensure smooth transition
+                    setTimeout(() => setIsLoading(false), 300);
                 }
             };
             img.onerror = () => {
                 console.error(`Failed to load frame ${i} at ${img.src}`);
                 loadedCount++;
+                setLoadProgress((loadedCount / totalFrames) * 100);
                 if (loadedCount === totalFrames) {
                     setImages(loadedImages);
+                    setTimeout(() => setIsLoading(false), 300);
                 }
             }
             loadedImages[i - 1] = img;
@@ -107,9 +117,12 @@ const ProductBottleScroll: React.FC<ProductBottleScrollProps> = ({ product }) =>
     return (
         <div ref={containerRef} className="relative h-[500vh]">
             <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden">
+                {isLoading && <BottleSkeleton />}
                 <canvas
                     ref={canvasRef}
-                    className="w-full h-full object-contain pointer-events-none"
+                    className={`w-full h-full object-contain pointer-events-none transition-opacity duration-500 ${
+                        isLoading ? 'opacity-0' : 'opacity-100'
+                    }`}
                 />
             </div>
         </div>
