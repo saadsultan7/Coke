@@ -38,15 +38,15 @@ const ProductTextOverlays: React.FC<ProductTextOverlaysProps> = ({ product }) =>
         <div ref={containerRef} className="absolute inset-0 pointer-events-none z-10">
             <div className="h-[500vh]">
                 {sections.map((section, index) => (
-                    <div key={index} className="sticky top-0 h-screen flex flex-col items-center justify-center px-6 text-center">
+                    <div key={index} className="sticky top-0 h-screen flex flex-col items-center justify-center px-4 sm:px-6 text-center">
                         <motion.div
                             style={{ opacity: section.opacity, y: section.y }}
                             className="max-w-4xl"
                         >
-                            <h2 className="text-6xl md:text-8xl font-black uppercase tracking-tighter mb-4 text-white drop-shadow-2xl">
+                            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black uppercase tracking-tighter mb-2 sm:mb-4 text-white drop-shadow-2xl">
                                 {section.data.title}
                             </h2>
-                            <p className="text-xl md:text-2xl font-medium text-white/60 tracking-tight">
+                            <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-medium text-white/60 tracking-tight px-4">
                                 {section.data.subtitle}
                             </p>
                         </motion.div>

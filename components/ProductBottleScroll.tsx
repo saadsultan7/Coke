@@ -64,23 +64,27 @@ const ProductBottleScroll: React.FC<ProductBottleScrollProps> = ({ product }) =>
                 const img = images[index];
                 if (!img) return;
 
+                const dpr = window.devicePixelRatio || 1;
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+
                 // Clear canvas
                 context.clearRect(0, 0, canvas.width, canvas.height);
 
                 // Draw image with "contain" fit
                 const imgRatio = img.width / img.height;
-                const canvasRatio = canvas.width / canvas.height;
+                const canvasRatio = width / height;
                 let drawWidth, drawHeight, x, y;
 
                 if (imgRatio > canvasRatio) {
-                    drawWidth = canvas.width;
-                    drawHeight = canvas.width / imgRatio;
+                    drawWidth = width;
+                    drawHeight = width / imgRatio;
                     x = 0;
-                    y = (canvas.height - drawHeight) / 2;
+                    y = (height - drawHeight) / 2;
                 } else {
-                    drawHeight = canvas.height;
-                    drawWidth = canvas.height * imgRatio;
-                    x = (canvas.width - drawWidth) / 2;
+                    drawHeight = height;
+                    drawWidth = height * imgRatio;
+                    x = (width - drawWidth) / 2;
                     y = 0;
                 }
 
@@ -99,8 +103,24 @@ const ProductBottleScroll: React.FC<ProductBottleScrollProps> = ({ product }) =>
     useEffect(() => {
         const handleResize = () => {
             if (canvasRef.current) {
-                canvasRef.current.width = window.innerWidth;
-                canvasRef.current.height = window.innerHeight;
+                const dpr = window.devicePixelRatio || 1;
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+                
+                // Set canvas size with device pixel ratio for crisp rendering
+                canvasRef.current.width = width * dpr;
+                canvasRef.current.height = height * dpr;
+                
+                // Scale context to match device pixel ratio
+                const context = canvasRef.current.getContext("2d");
+                if (context) {
+                    context.scale(dpr, dpr);
+                }
+                
+                // Set CSS size
+                canvasRef.current.style.width = `${width}px`;
+                canvasRef.current.style.height = `${height}px`;
+                
                 // Redraw current frame
                 const currentProgress = scrollYProgress.get();
                 const frameIndex = Math.min(239, Math.floor(currentProgress * 240));
